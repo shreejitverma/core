@@ -370,8 +370,10 @@ class Trashbin {
 			if (!$result) {
 				Util::writeLog('files_trashbin', 'trash bin database couldn\'t be updated', Util::ERROR);
 			}
-			Util::emitHook('\OCA\Files_Trashbin\Trashbin', 'post_moveToTrash', ['filePath' => Filesystem::normalizePath($file_path),
-				'trashPath' => Filesystem::normalizePath($filename . '.d' . $timestamp)]);
+			Util::emitHook('\OCA\Files_Trashbin\Trashbin', 'post_moveToTrash', [
+				'filePath' => Filesystem::normalizePath($file_path),
+				'trashPath' => Filesystem::normalizePath($filename . '.d' . $timestamp)
+			]);
 
 			self::retainVersions($filename, $owner, $ownerPath, $timestamp, $sourceStorage);
 
@@ -550,6 +552,12 @@ class Trashbin {
 			return false;
 		}
 		$mtime = $view->filemtime($source);
+
+		Util::emitHook('\OCA\Files_Trashbin\Trashbin', 'pre_restore', [
+			'user' => $user,
+			'source' => $source,
+			'target' => $target
+		]);
 
 		// restore file
 		$restoreResult = $view->rename($source, $target);
