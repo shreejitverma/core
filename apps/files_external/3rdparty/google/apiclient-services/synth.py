@@ -52,8 +52,8 @@ shell.run(
 
 def generate_service(disco: str):
     m = re.search(VERSION_REGEX, disco)
-    name = m.group(1)
-    version = m.group(2)
+    name = m[1]
+    version = m[2]
     template = TEMPLATE_VERSIONS[-1] # Generate for latest version
 
     log.info(f"Generating {name} {version} ({template}).")
@@ -62,15 +62,16 @@ def generate_service(disco: str):
     input_file = discovery / "discoveries" / disco
 
     command = (
-        f"python2 -m googleapis.codegen --output_dir={output_dir}" +
-        f" --input={input_file} --language=php --language_variant={template}" +
-        f" --package_path=api/services"
+        f"python2 -m googleapis.codegen --output_dir={output_dir}"
+        + f" --input={input_file} --language=php --language_variant={template}"
+        + " --package_path=api/services"
     )
+
 
     shell.run(f"mkdir -p {output_dir}".split(), cwd=repository / "generator")
     shell.run(command.split(), cwd=repository, hide_output=False)
 
-    s.copy(output_dir, f"src")
+    s.copy(output_dir, "src")
 
 def all_discoveries(skip=None, prefer=None):
     """Returns a map of API IDs to Discovery document filenames.
